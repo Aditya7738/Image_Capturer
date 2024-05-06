@@ -1,16 +1,21 @@
 package com.example.image_capturer
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val addFabBtn = findViewById<FloatingActionButton>(R.id.addImages)
 
         if(!hasRequiredPermission()){
             ActivityCompat.requestPermissions(
@@ -18,6 +23,11 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(CAMERA_PERMISSION),
                 0
             )
+        }
+
+        addFabBtn.setOnClickListener(){
+            val intent = Intent(this, CameraActivity::class.java)
+            startActivity(intent)
         }
     }
 

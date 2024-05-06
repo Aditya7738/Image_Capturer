@@ -6,31 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-   <TextureView
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-      android:id="@+id/textureView"/>
 
-   <ImageView
-       android:layout_width="50dp"
-       android:layout_height="50dp"
-      android:src="@drawable/baseline_camera_24"
-       android:layout_alignParentBottom="true"
-       android:layout_centerHorizontal="true"
-       android:id="@+id/capture"
-
-       android:layout_marginBottom="20dp"/>
-
-   <ImageView
-       android:layout_width="50dp"
-       android:layout_height="50dp"
-       android:src="@drawable/baseline_cameraswitch_24"
-       android:layout_alignParentBottom="true"
-       android:layout_centerHorizontal="true"
-       android:id="@+id/capture_switch"
-         android:layout_alignParentRight="true"
-       android:layout_marginRight="20dp"
-       android:layout_marginBottom="20dp"/>
-
+<com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/addImages"
+    android:layout_alignParentBottom="true"
+    android:layout_alignParentRight="true"
+    android:layout_marginRight="20dp"
+    android:layout_marginBottom="20dp"
+    android:src="@drawable/baseline_add_24"
+    />
 
 </RelativeLayout>

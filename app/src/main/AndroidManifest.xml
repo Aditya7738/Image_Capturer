@@ -4,8 +4,10 @@
 
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Image_Capturer"
         tools:targetApi="31">
+        <activity
+            android:name=".CameraActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
