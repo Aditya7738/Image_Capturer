@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,9 +39,10 @@ class MainActivity : AppCompatActivity() {
 
         getPermission()
 
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = ImageAdapter(imageList)
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
 
         addFabBtn.setOnClickListener{
             val intent = Intent(applicationContext, CameraActivity::class.java)
@@ -50,24 +52,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getPermission(){
-        var permissionList = mutableListOf<String>()
+        val permissionList = mutableListOf<String>()
 
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             permissionList.add(Manifest.permission.CAMERA)
         }
 
 
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-
-        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-
-        if (checkSelfPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissionList.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-        }
+//        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//        }
+//
+//        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+//        }
+//
+//        if (checkSelfPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            permissionList.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+//        }
 
         if(permissionList.size > 0){
             requestPermissions(permissionList.toTypedArray(), 101)
@@ -104,6 +106,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+
+        Log.d("MAINACTIVITY", "resultCode $resultCode")
+
+        Log.d("MAINACTIVITY", "Activity.RESULT_OK ${Activity.RESULT_OK}")
+
+        Log.d("MAINACTIVITY", "requestCode $requestCode")
+
+        Log.d("MAINACTIVITY", "REQUEST_CODE_CAPTURE_PHOTO ${REQUEST_CODE_CAPTURE_PHOTO}")
+
+        Log.d("MAINACTIVITY", "requestCode == REQUEST_CODE_CAPTURE_PHOTO && resultCode == Activity.RESULT_OK ${requestCode == REQUEST_CODE_CAPTURE_PHOTO && resultCode == Activity.RESULT_OK}")
+
+        Log.d("MAINACTIVITY", "Activity.RESULT_OK ${resultCode == Activity.RESULT_OK}")
 
         if (requestCode == REQUEST_CODE_CAPTURE_PHOTO && resultCode == Activity.RESULT_OK) {
             val capturedBitmap = data?.getParcelableExtra<Bitmap>("captured_photo_bitmap")

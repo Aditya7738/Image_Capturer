@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCaptureSession
@@ -23,6 +25,7 @@ import android.view.TextureView
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -70,7 +73,7 @@ class CameraActivity : AppCompatActivity() {
         handlerThread.start()
         handler = Handler((handlerThread).looper)
 
-        imageReader = ImageReader.newInstance(1080,1920, ImageFormat.JPEG, 1)
+        imageReader = ImageReader.newInstance(720,1280, ImageFormat.JPEG, 1)
 
         imageReader.setOnImageAvailableListener(object: ImageReader.OnImageAvailableListener{
             override fun onImageAvailable(p0: ImageReader?) {
@@ -80,28 +83,35 @@ class CameraActivity : AppCompatActivity() {
                     val buffer = image.planes[0].buffer
                     val bytes = ByteArray(buffer.remaining())
                     buffer.get(bytes)
+                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    val outputStream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
+                    val newbytes = outputStream.toByteArray()
 
-                    val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "IMG ${LocalDateTime.now()}")
 
-                    try{
-                        val outputStream = FileOutputStream(file)
-
-                        outputStream.write(bytes)
-
-                        outputStream.close()
-                    }catch(e: IOException){
-                        e.printStackTrace()
-                        Log.d("CAMERA SAVE FILE ERROR", e.toString())
-                    }
+                    val newbitmap = BitmapFactory.decodeByteArray(newbytes, 0, newbytes.size)
+//                    val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "IMG ${LocalDateTime.now()}")
+//
+//                    try{
+//                        val outputStream = FileOutputStream(file)
+//
+//                        outputStream.write(bytes)
+//
+//                        outputStream.close()
+//                    }catch(e: IOException){
+//                        e.printStackTrace()
+//                        Log.d("CAMERA SAVE FILE ERROR", e.toString())
+//                    }
 
 
 
                     val intent = Intent(this@CameraActivity, MainActivity::class.java)
-                        .apply{
-                            putExtra("captured_image_path",  file.absolutePath)
-                        }
+                    intent.putExtra("captured_photo_bitmap", newbitmap)
 
+                    Log.d("CAMERA", "${Activity.RESULT_OK}")
                     setResult(Activity.RESULT_OK, intent)
+
+                    Log.d("CAMERA", "${Activity.RESULT_OK}")
                     finish()
 
 
