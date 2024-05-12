@@ -1,17 +1,25 @@
 package com.example.image_capturer
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.ImageFormat
+import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCaptureSession
+import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
+import android.hardware.camera2.CameraMetadata
 import android.hardware.camera2.CaptureRequest
 import android.media.ImageReader
 import androidx.appcompat.app.AppCompatActivity
@@ -19,12 +27,16 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
+import android.os.Looper
 import android.util.Log
 import android.view.Surface
 import android.view.TextureView
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.view.drawToBitmap
+import androidx.lifecycle.ViewModelProvider
+import com.example.image_capturer.viewModel.SharedPhotoViewModel
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -56,6 +68,10 @@ class CameraActivity : AppCompatActivity() {
 
     lateinit var imageReader: ImageReader
 
+    lateinit var cameraIdList: Array<String>
+
+    private lateinit var sharedViewModel: SharedPhotoViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,27 +85,74 @@ class CameraActivity : AppCompatActivity() {
 
         cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
+        cameraIdList = cameraManager.cameraIdList
+
         handlerThread = HandlerThread("videoThread")
         handlerThread.start()
         handler = Handler((handlerThread).looper)
 
-        imageReader = ImageReader.newInstance(720,1280, ImageFormat.JPEG, 1)
+        imageReader = ImageReader.newInstance(480,720, ImageFormat.JPEG, 55)
+
+        sharedViewModel = ViewModelProvider(this).get(SharedPhotoViewModel::class.java)
 
         imageReader.setOnImageAvailableListener(object: ImageReader.OnImageAvailableListener{
+            @SuppressLint("Recycle")
             override fun onImageAvailable(p0: ImageReader?) {
                 val image = p0?.acquireLatestImage()
                 if(image != null){
-                    Toast.makeText(this@CameraActivity, "Image captured", Toast.LENGTH_LONG).show()
-                    val buffer = image.planes[0].buffer
-                    val bytes = ByteArray(buffer.remaining())
-                    buffer.get(bytes)
-                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    val outputStream = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
-                    val newbytes = outputStream.toByteArray()
+                    //Toast.makeText(this@CameraActivity, "Image captured", Toast.LENGTH_LONG).show()
+
+//                    val uiHandler = Handler(Looper.getMainLooper())
+//                    val runnable = Runnable {
+//
+//                        @Override
+//                        fun run() {
+
+                            val buffer = image.planes[0].buffer
+                            val bytes = ByteArray(buffer.remaining())
+                            buffer.get(bytes)
+                            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+
+                            val outputStream = ByteArrayOutputStream()
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 15, outputStream)
+                            val newBytes = outputStream.toByteArray()
 
 
-                    val newbitmap = BitmapFactory.decodeByteArray(newbytes, 0, newbytes.size)
+                            val newBitmap = BitmapFactory.decodeByteArray(newBytes, 0, newBytes.size)
+
+                           // val processedBitmap = processImage(newBitmap)
+                            sharedViewModel.setCapturedPhotoBitmap(newBitmap)
+//                        }
+//                    }
+//
+//                    uiHandler.post(runnable)
+
+//                    textureView.post {
+//                        try {
+//
+//                        val surface = Surface(textureView.surfaceTexture)
+//                        val surfaceWidth = textureView.width
+//                        val surfaceHeight = textureView.height
+//                            if (surfaceWidth > 0 && surfaceHeight > 0) {
+//                                val lockRect = Rect(0, 0, surfaceWidth, surfaceHeight)
+//                                val canvas = surface.lockCanvas(lockRect)
+//                                if(canvas != null){
+//                                    canvas.drawBitmap(processedBitmap, 0f, 0f, null)
+//                                    surface.unlockCanvasAndPost(canvas)
+//                                }else{
+//                                    Log.d("CAMERA ERROR", "canvas != null ${canvas != null}")
+//                                }
+//
+//                            }else{
+//                                Log.d("CAMERA ERROR", "surfaceWidth > 0 && surfaceHeight > 0 ${surfaceWidth > 0 && surfaceHeight > 0}")
+//                            }
+//
+//                    }catch(e: Exception){
+//                        Log.d("CAMERA ERROR", e.toString())
+//                    }
+//                    }
+
+
 //                    val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "IMG ${LocalDateTime.now()}")
 //
 //                    try{
@@ -105,13 +168,15 @@ class CameraActivity : AppCompatActivity() {
 
 
 
-                    val intent = Intent(this@CameraActivity, MainActivity::class.java)
-                    intent.putExtra("captured_photo_bitmap", newbitmap)
+//                    val intent = Intent(this@CameraActivity, MainActivity::class.java)
+//                    intent.putExtra("captured_photo_bitmap", newbitmap)
 
-                    Log.d("CAMERA", "${Activity.RESULT_OK}")
-                    setResult(Activity.RESULT_OK, intent)
 
-                    Log.d("CAMERA", "${Activity.RESULT_OK}")
+
+//                    Log.d("CAMERA", "${Activity.RESULT_OK}")
+//                    setResult(Activity.RESULT_OK)
+//
+//                    Log.d("CAMERA", "${Activity.RESULT_OK}")
                     finish()
 
 
@@ -146,8 +211,8 @@ class CameraActivity : AppCompatActivity() {
         textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener{
             override fun onSurfaceTextureAvailable(p0: SurfaceTexture, p1: Int, p2: Int) {
                 Log.d("Camera", "Step1")
-                currentCameraId = cameraManager.cameraIdList[0]
-                openCamera(currentCameraId)
+               currentCameraId = cameraIdList[0]
+                openCamera()
                 Log.d("Camera", "last Step")
             }
 
@@ -167,15 +232,44 @@ class CameraActivity : AppCompatActivity() {
 
     }
 
+//    private fun processImage(bitmap: Bitmap): Bitmap {
+//        // Example of image processing: converting to grayscale
+//     //   val uiHandler = Handler(Looper.getMainLooper())
+//       lateinit var grayscaleBitmap: Bitmap
+////        val runnable = Runnable {
+////
+////            @Override
+////            fun run() {
+//                val width = bitmap.width
+//                val height = bitmap.height
+//                grayscaleBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+//                val canvas = Canvas(grayscaleBitmap)
+//                val paint = Paint().apply {
+//                    colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+//                }
+//                canvas.drawBitmap(bitmap, 0f, 0f, paint)
+////            }
+////        }
+////
+////        uiHandler.post(runnable)
+//            return grayscaleBitmap
+//    }
+
     override fun onDestroy() {
         super.onDestroy()
-        cameraDevice!!.close()
+        if(cameraDevice != null) {
+            cameraDevice!!.close()
+
+            cameraDevice = null
+        }
+        cameraCaptureSession.close()
+
         handler.removeCallbacksAndMessages(null)
         handlerThread.quitSafely()
     }
 
 
-    fun openCamera(cameraId: String){
+    fun openCamera(){
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.CAMERA
@@ -195,7 +289,18 @@ class CameraActivity : AppCompatActivity() {
             cameraDevice!!.close()
         }
 
-        cameraManager.openCamera(cameraId, object : CameraDevice.StateCallback(){
+//        var cameraCharacteristics: CameraCharacteristics
+//
+//        for(cameraId: String in cameraIdList){
+//            cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
+//
+//            if(cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == CameraMetadata.LENS_FACING_BACK){
+//                currentCameraId = cameraId
+//                break
+//            }
+//        }
+
+        cameraManager.openCamera(currentCameraId, object : CameraDevice.StateCallback(){
 
 
 
@@ -207,6 +312,7 @@ class CameraActivity : AppCompatActivity() {
 
                 val surface = Surface(textureView.surfaceTexture)
                 captureRequestBuilder.addTarget(surface)
+            //    captureRequestBuilder.addTarget(imageReader.surface)
 
                 cameraDevice!!.createCaptureSession(listOf(surface, imageReader.surface), object:
                     CameraCaptureSession.StateCallback() {
@@ -247,4 +353,18 @@ class CameraActivity : AppCompatActivity() {
 //            Toast.makeText(applicationContext, "Front camera is not available", Toast.LENGTH_LONG).show()
 //        }
 //    }
+
+    fun onSwitchCamera(){
+//        var cameraCharacteristics: CameraCharacteristics
+//
+//        for(cameraId: String in cameraIdList){
+//            cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
+//
+//            var LENS_FACING = cameraCharacteristics.get(CameraCharacteristics.LENS_FACING)
+//            if(LENS_FACING == CameraMetadata.LENS_FACING_BACK){
+//
+//
+//            }else if(LENS_FACING == CameraMetadata.LENS_FACING_FRONT)
+//        }
+    }
 }

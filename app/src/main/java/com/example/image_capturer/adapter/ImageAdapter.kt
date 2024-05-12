@@ -1,15 +1,19 @@
 package com.example.image_capturer.adapter
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.image_capturer.R
+import com.example.image_capturer.ShowImageActivity
 import com.example.image_capturer.model.ImageData
 
-class ImageAdapter(private val imageList: List<ImageData>) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
+class ImageAdapter(private val context: Context, private val imageList: List<ImageData>) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.capture_image_view)
@@ -25,6 +29,11 @@ class ImageAdapter(private val imageList: List<ImageData>) : RecyclerView.Adapte
         val imageData = imageList[position]
         holder.imageView.setImageBitmap(imageData.bitmap)
         holder.textView.text = imageData.name
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, ShowImageActivity::class.java)
+            startActivity(context, intent, null)
+        }
     }
 
     override fun getItemCount(): Int {

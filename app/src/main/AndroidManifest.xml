@@ -7,9 +7,11 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <application
         android:allowBackup="true"
@@ -21,6 +23,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Image_Capturer"
         tools:targetApi="31">
+        <activity
+            android:name=".SharedDataActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ShowImageActivity"
+            android:exported="false" />
         <activity
             android:name=".CameraActivity"
             android:exported="false" />

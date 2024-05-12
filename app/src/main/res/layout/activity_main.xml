@@ -4,25 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
     tools:context=".MainActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/mainToolbar"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:background="@color/purple"
+        app:title="Image capturer"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/title"
         android:text="List of images captured"
-
+        android:layout_below="@+id/mainToolbar"
         android:gravity="center_horizontal"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:padding="10dp"
         />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/image_list"
-
+        android:padding="10dp"
         android:layout_below="@+id/title"/>
 
 <com.google.android.material.floatingactionbutton.FloatingActionButton
