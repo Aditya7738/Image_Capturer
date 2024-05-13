@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -27,7 +28,7 @@ import java.util.concurrent.Executor
 class MainActivity : AppCompatActivity() {
     private var imageList = mutableListOf<ImageData>()
     private lateinit var adapter: ImageAdapter
-    val REQUEST_CODE_CAPTURE_PHOTO = 101
+   // private val REQUEST_CODE_CAPTURE_PHOTO = 101
     private lateinit var sharedViewModel: SharedPhotoViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,12 +55,7 @@ class MainActivity : AppCompatActivity() {
 
 
         getPermission()
-//
-//        val uiHandler = Handler(Looper.getMainLooper())
-//        val runnable = Runnable {
-//
-//            @Override
-//            fun run(){
+
                 sharedViewModel = ViewModelProvider(this).get(SharedPhotoViewModel::class.java)
 
 
@@ -68,18 +64,17 @@ class MainActivity : AppCompatActivity() {
 
                 recyclerView.layoutManager = LinearLayoutManager(this)
 
-                sharedViewModel.capturedPhotoBitmap.observe(this, Observer { bitmap ->
+                sharedViewModel.capturedPhotoBitmap.observe(this, Observer<Bitmap> { bitmap ->
+
                     imageList.add(ImageData("IMG ${LocalDateTime.now()}", bitmap))
-                })
+                }).also {
+                    Toast.makeText(applicationContext, "Image added to image List", Toast.LENGTH_LONG).show()
+                }
 
                 adapter = ImageAdapter(this@MainActivity, imageList)
                 recyclerView.adapter = adapter
 
                 adapter.notifyDataSetChanged()
-//            }
-//        }
-//
-//        uiHandler.post(runnable)
 
 
 
@@ -89,8 +84,8 @@ class MainActivity : AppCompatActivity() {
 
         addFabBtn.setOnClickListener{
             val intent = Intent(applicationContext, CameraActivity::class.java)
-
-            startActivityForResult(intent, REQUEST_CODE_CAPTURE_PHOTO)
+            startActivity(intent)
+            //startActivityForResult(intent, REQUEST_CODE_CAPTURE_PHOTO)
         }
     }
 
@@ -104,36 +99,11 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-//        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//        }
-//
-//        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            permissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-//        }
-//
-//        if (checkSelfPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            permissionList.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-//        }
-
         if(permissionList.size > 0){
             requestPermissions(permissionList.toTypedArray(), 101)
         }
     }
 
-//    fun hasRequiredPermission(): Boolean{
-//        return ContextCompat.checkSelfPermission(
-//            applicationContext,
-//            CAMERA_PERMISSION
-//        ) == PackageManager.PERMISSION_GRANTED
-//    }
-//
-//    companion object{
-//        private val CAMERA_PERMISSION = Manifest.permission.CAMERA;
-//        private val READ_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
-//        private val WRITE_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-//        private val MANAGE_EXTERNAL_STORAGE_PERMISSION = Manifest.permission.MANAGE_EXTERNAL_STORAGE;
-//    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

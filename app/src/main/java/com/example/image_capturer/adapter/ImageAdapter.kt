@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.image_capturer.R
@@ -22,6 +23,7 @@ class ImageAdapter(private val context: Context, private val imageList: List<Ima
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.image_list_item, parent, false)
+        Toast.makeText(parent.context, "View Holder Created", Toast.LENGTH_LONG).show()
         return ViewHolder(view)
     }
 
@@ -30,6 +32,7 @@ class ImageAdapter(private val context: Context, private val imageList: List<Ima
         holder.imageView.setImageBitmap(imageData.bitmap)
         holder.textView.text = imageData.name
 
+        Toast.makeText(context, "imageData.name ${imageData.name}", Toast.LENGTH_LONG).show()
         holder.itemView.setOnClickListener {
             val intent = Intent(context, ShowImageActivity::class.java)
             startActivity(context, intent, null)

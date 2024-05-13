@@ -98,8 +98,10 @@ class CameraActivity : AppCompatActivity() {
         imageReader.setOnImageAvailableListener(object: ImageReader.OnImageAvailableListener{
             @SuppressLint("Recycle")
             override fun onImageAvailable(p0: ImageReader?) {
+                Toast.makeText(applicationContext, "Image Available", Toast.LENGTH_LONG).show()
                 val image = p0?.acquireLatestImage()
                 if(image != null){
+                    Toast.makeText(applicationContext,"Image not Null", Toast.LENGTH_LONG).show()
                     //Toast.makeText(this@CameraActivity, "Image captured", Toast.LENGTH_LONG).show()
 
 //                    val uiHandler = Handler(Looper.getMainLooper())
@@ -114,7 +116,7 @@ class CameraActivity : AppCompatActivity() {
                             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 
                             val outputStream = ByteArrayOutputStream()
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 15, outputStream)
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 10, outputStream)
                             val newBytes = outputStream.toByteArray()
 
 
@@ -177,7 +179,10 @@ class CameraActivity : AppCompatActivity() {
 //                    setResult(Activity.RESULT_OK)
 //
 //                    Log.d("CAMERA", "${Activity.RESULT_OK}")
-                    finish()
+
+                    val intent = Intent(this@CameraActivity, MainActivity::class.java)
+                    startActivity(intent)
+                   // finish()
 
 
                     image.close()

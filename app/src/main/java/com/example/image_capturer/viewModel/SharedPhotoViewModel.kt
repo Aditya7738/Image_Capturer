@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class SharedPhotoViewModel: ViewModel() {
-    private val _capturedPhotoBitmap = MutableLiveData<Bitmap>()
+    private var _capturedPhotoBitmap = MutableLiveData<Bitmap>()
 
     val capturedPhotoBitmap: LiveData<Bitmap>
         get() = _capturedPhotoBitmap
